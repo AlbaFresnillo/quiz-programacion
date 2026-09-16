@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Frontend Quiz - Host Screen</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        background: #0f172a;
+        color: #f8fafc;
+        margin: 0;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+      .card {
+        background: #1e293b;
+        border-radius: 16px;
+        padding: 30px;
+        width: 100%;
+        max-width: 850px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        text-align: center;
+      }
+      .badge {
+        background: #0284c7;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .timer-circle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: #334155;
+        color: #38bdf8;
+        font-size: 1.3rem;
+        font-weight: 800;
+        border: 3px solid #38bdf8;
+      }
+      .timer-circle.danger {
+        border-color: #ef4444;
+        color: #ef4444;
+        animation: pulse 0.6s infinite alternate;
+      }
+      @keyframes pulse {
+        from {
+          transform: scale(1);
+        }
+        to {
+          transform: scale(1.1);
+        }
+      }
+
+      .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin: 25px 0;
+      }
+      .player-tag {
+        background: #334155;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 25px 0;
+      }
+      .opt {
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: left;
+        background: #0f172a;
+        border: 2px solid #334155;
+      }
+      .opt.c-0 {
+        border-color: #ef4444;
+        color: #fca5a5;
+      }
+      .opt.c-1 {
+        border-color: #3b82f6;
+        color: #93c5fd;
+      }
+      .opt.c-2 {
+        border-color: #eab308;
+        color: #fde047;
+      }
+      .opt.c-3 {
+        border-color: #22c55e;
+        color: #86efac;
+      }
+      .opt.correct {
+        background: #15803d !important;
+        color: white !important;
+      }
+      .btn {
+        background: #38bdf8;
+        color: #0f172a;
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 14px 32px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+      .btn:hover {
+        background: #7dd3fc;
+      }
+      .leaderboard {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+        font-size: 1.2rem;
+      }
+      .leaderboard li {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 20px;
+        background: #0f172a;
+        border-radius: 8px;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div id="view-lobby">
+        <h1>Frontend Kahoot Quiz</h1>
+        <p style="color: #94a3b8; font-size: 1.2rem; margin-top: 10px">
+          Jugadores conectados en la sala:
+        </p>
+        <div class="player-list" id="lobby-players"></div>
+        <button class="btn" id="btn-start" onclick="startGame()">
+          Comenzar Quiz
+        </button>
+      </div>
+
+      <div id="view-game" style="display: none">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+          "
+        >
+          <span class="badge" id="q-category"></span>
+          <div class="timer-circle" id="host-timer">15</div>
+          <span id="ans-counter" style="color: #38bdf8; font-weight: bold"
+            >Respuestas: 0</span
+          >
+        </div>
+        <h2 id="q-text" style="margin-bottom: 20px; font-size: 1.6rem"></h2>
+        <div class="grid" id="q-options"></div>
+        <div
+          id="explanation"
+          style="
+            display: none;
+            background: #020617;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: left;
+            color: #cbd5e1;
+          "
+        ></div>
+        <button class="btn" id="btn-reveal" onclick="revealAnswer()">
+          Revelar Respuesta
+        </button>
+        <button
+          class="btn"
+          id="btn-next"
+          style="display: none"
+          onclick="nextQuestion()"
+        >
+          Siguiente →
+        </button>
+      </div>
+
+      <div id="view-leaderboard" style="display: none">
+        <h2>Clasificación Top 5</h2>
+        <ul class="leaderboard" id="leaderboard-list"></ul>
+      </div>
+    </div>
+
+    <script>
+      const socket = io();
+
+      socket.on("lobby:update", (players) => {
+        const el = document.getElementById("lobby-players");
+        el.innerHTML = players
+          .map((p) => `<span class="player-tag">${p.name}</span>`)
+          .join("");
+      });
+
+      socket.on("host:answerCount", ({ answered, total }) => {
+        document.getElementById("ans-counter").innerText =
+          `Respuestas: ${answered} / ${total}`;
+      });
+
+      socket.on("game:timer", (seconds) => {
+        const timerEl = document.getElementById("host-timer");
+        timerEl.innerText = seconds;
+        if (seconds <= 5) {
+          timerEl.classList.add("danger");
+        } else {
+          timerEl.classList.remove("danger");
+        }
+      });
+
+      socket.on("game:question", (data) => {
+        document.getElementById("view-lobby").style.display = "none";
+        document.getElementById("view-leaderboard").style.display = "none";
+        document.getElementById("view-game").style.display = "block";
+
+        document.getElementById("q-category").innerText = data.category;
+        document.getElementById("ans-counter").innerText = "Respuestas: 0";
+        document.getElementById("q-text").innerText = data.question;
+        document.getElementById("explanation").style.display = "none";
+        document.getElementById("btn-reveal").style.display = "inline-block";
+        document.getElementById("btn-next").style.display = "none";
+
+        const letters = ["▲ Rojo", "◆ Azul", "● Amarillo", "■ Verde"];
+        const optContainer = document.getElementById("q-options");
+        optContainer.innerHTML = data.options
+          .map(
+            (opt, i) => `
+        <div class="opt c-${i}" id="opt-${i}">
+          <span>${letters[i]}</span><br>${opt}
+        </div>
+      `,
+          )
+          .join("");
+      });
+
+      socket.on("game:reveal", (data) => {
+        document.getElementById(`opt-${data.correct}`).classList.add("correct");
+        const exp = document.getElementById("explanation");
+        exp.innerHTML = `<strong>Explicación:</strong> ${data.explanation}`;
+        exp.style.display = "block";
+        document.getElementById("btn-reveal").style.display = "none";
+        document.getElementById("btn-next").style.display = "inline-block";
+
+        const list = document.getElementById("leaderboard-list");
+        list.innerHTML = data.leaderboard
+          .map(
+            (p, idx) => `
+        <li><span>#${idx + 1} ${p.name}</span><strong>${p.score} pts</strong></li>
+      `,
+          )
+          .join("");
+        document.getElementById("view-leaderboard").style.display = "block";
+      });
+
+      socket.on("game:finished", () => {
+        document.getElementById("view-game").style.display = "none";
+        document.getElementById("view-leaderboard").style.display = "block";
+        document.querySelector("#view-leaderboard h2").innerText =
+          "🏆 ¡Podio Final!";
+      });
+
+      function startGame() {
+        socket.emit("host:start");
+      }
+      function revealAnswer() {
+        socket.emit("host:reveal");
+      }
+      function nextQuestion() {
+        socket.emit("host:next");
+      }
+    </script>
+  </body>
+</html>
