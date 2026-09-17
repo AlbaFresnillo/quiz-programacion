@@ -10,263 +10,241 @@ const io = new Server(server);
 app.use(express.static(path.join(__dirname, "public")));
 
 const questions = [
-  // --- Bloque 1: Códigos HTTP y Red ---
+  // --- Bloque 1: Componentes y Arquitectura Moderna ---
   {
-    category: "Bloque 1: Códigos HTTP y Red",
+    category: "Bloque 1: Componentes y Arquitectura",
     question:
-      "¿Qué código HTTP devuelve el servidor cuando el contenido no ha cambiado y el navegador puede usar su copia en caché?",
+      "En Angular moderno, ¿cuál es la forma estándar de declarar componentes sin necesidad de NgModule?",
     options: [
-      "200 OK",
-      "304 Not Modified",
-      "204 No Content",
-      "412 Precondition Failed",
+      "Dynamic Components",
+      "Standalone Components",
+      "Core Components",
+      "Stateless Modules",
     ],
     correct: 1,
     explanation:
-      "304 Not Modified indica que la copia en caché sigue vigente. Se usa con cabeceras como If-None-Match o If-Modified-Since.",
+      "Los Standalone Components eliminan la necesidad de NgModule importando dependencias directamente en el decorador @Component.",
   },
   {
-    category: "Bloque 1: Códigos HTTP y Red",
-    question: "¿Qué significa exactamente el error HTTP 403?",
-    options: [
-      "La página no existe",
-      "El servidor se ha caído",
-      "El acceso al recurso está prohibido",
-      "La sesión ha caducado",
-    ],
-    correct: 2,
-    explanation:
-      "403 Forbidden indica que el servidor comprende la solicitud pero deniega el acceso, sin depender de si hay credenciales válidas.",
-  },
-  {
-    category: "Bloque 1: Códigos HTTP y Red",
+    category: "Bloque 1: Componentes y Arquitectura",
     question:
-      "¿Cuál de estos métodos HTTP se considera idempotente por especificación?",
-    options: ["POST", "PATCH", "PUT", "CONNECT"],
-    correct: 2,
-    explanation:
-      "PUT es idempotente: ejecutar la misma petición varias veces deja el recurso exactamente en el mismo estado final.",
-  },
-  {
-    category: "Bloque 1: Códigos HTTP y Red",
-    question:
-      "¿Qué mecanismo HTTP impide que tu web sea incrustada dentro de un <iframe> ajeno?",
-    options: [
-      "X-Frame-Options (o Content-Security-Policy con frame-ancestors)",
-      "Access-Control-Allow-Origin",
-      "Cache-Control",
-      "Strict-Transport-Security",
-    ],
-    correct: 0,
-    explanation:
-      "X-Frame-Options y CSP frame-ancestors previenen ataques de clickjacking bloqueando la incrustación en iframes.",
-  },
-  {
-    category: "Bloque 1: Códigos HTTP y Red",
-    question: '¿Cuál es el código HTTP oficial conocido como "I\'m a teapot"?',
-    options: ["400", "418", "505", "499"],
+      "En la nueva sintaxis de control de flujo en templates, ¿qué directiva sustituye a *ngIf?",
+    options: ["#if", "@if", "v-if", "[ngIf]"],
     correct: 1,
     explanation:
-      "El código 418 nació en el RFC 2324 como una broma del April Fools' Day en 1998 y quedó en la cultura web.",
+      "El bloque @if forma parte del nuevo Control Flow nativo del compilador y no requiere importar CommonModule.",
+  },
+  {
+    category: "Bloque 1: Componentes y Arquitectura",
+    question:
+      "¿Qué parámetro es estrictamente obligatorio al utilizar el nuevo bloque @for en los templates?",
+    options: ["let index", "track", "pipe", "async"],
+    correct: 1,
+    explanation:
+      "track es obligatorio para optimizar el rendimiento de renderizado identificando elementos únicos en el DOM.",
+  },
+  {
+    category: "Bloque 1: Componentes y Arquitectura",
+    question:
+      "¿Qué bloque complementario se utiliza junto con @for para mostrar contenido cuando la lista está vacía?",
+    options: ["@default", "@empty", "@else", "@fallback"],
+    correct: 1,
+    explanation:
+      "El bloque @empty se renderiza automáticamente si la colección iterada en el @for no contiene elementos.",
+  },
+  {
+    category: "Bloque 1: Componentes y Arquitectura",
+    question:
+      "¿Qué función moderna se recomienda para resolver servicios sin declararlos en el constructor?",
+    options: ["getService()", "inject()", "useService()", "provide()"],
+    correct: 1,
+    explanation:
+      "inject() permite resolver dependencias en el contexto de inyección (propiedades, funciones auxiliares) sin saturar el constructor.",
   },
 
-  // --- Bloque 2: Atajos y DevTools ---
+  // --- Bloque 2: Signals y Reactividad ---
   {
-    category: "Bloque 2: Atajos y DevTools",
+    category: "Bloque 2: Signals y Reactividad",
     question:
-      "En la consola de DevTools de Chrome, ¿qué devuelve la variable $0?",
+      "¿Qué función nativa crea un Signal de solo lectura derivado automáticamente de otros Signals?",
+    options: ["effect()", "computed()", "derive()", "memo()"],
+    correct: 1,
+    explanation:
+      "computed() genera un valor reactivo derivado que solo se recalcula de forma lazy cuando sus dependencias cambian.",
+  },
+  {
+    category: "Bloque 2: Signals y Reactividad",
+    question:
+      "¿Cómo se lee el valor actual de un Signal llamado 'counter' en TypeScript o plantillas?",
+    options: ["counter.value", "counter()", "counter.get()", "$counter"],
+    correct: 1,
+    explanation:
+      "Los Signals son funciones getter; se ejecutan invocándolos como counter() para leer su valor y registrar la dependencia.",
+  },
+  {
+    category: "Bloque 2: Signals y Reactividad",
+    question:
+      "¿Qué método de un WritableSignal se utiliza cuando el nuevo valor depende del valor anterior?",
+    options: ["set()", "update()", "mutate()", "patch()"],
+    correct: 1,
+    explanation:
+      "update(fn) recibe el valor actual y devuelve el nuevo estado de forma inmutable. set() sobrescribe sin importar el anterior.",
+  },
+  {
+    category: "Bloque 2: Signals y Reactividad",
+    question:
+      "¿Dónde está permitido ejecutar effect() sin necesidad de pasar un Injector manual?",
     options: [
-      "El último valor impreso en consola",
-      "El elemento actualmente seleccionado en Elements",
-      "El primer <script> de la página",
-      "null",
+      "Dentro de cualquier método público",
+      "Únicamente en el contexto de inyección (constructor o inicializadores)",
+      "En la plantilla HTML",
+      "Dentro del hook ngOnDestroy",
     ],
     correct: 1,
     explanation:
-      "$0 devuelve el nodo del DOM seleccionado en la pestaña Elements. $1, $2, etc., recuerdan selecciones anteriores.",
+      "effect() necesita un contexto de inyección para enlazarse al ciclo de vida del componente y limpiarse automáticamente.",
   },
   {
-    category: "Bloque 2: Atajos y DevTools",
-    question: "¿Qué atajo abre la paleta de comandos de Chrome DevTools?",
-    options: [
-      "Ctrl + Shift + P / Cmd + Shift + P",
-      "F11",
-      "Ctrl + Shift + D / Cmd + Shift + D",
-      "Alt + C",
-    ],
-    correct: 0,
-    explanation:
-      "Ctrl/Cmd + Shift + P abre la paleta de comandos para ejecutar acciones rápidas (screenshots, modo oscuro, etc.).",
-  },
-  {
-    category: "Bloque 2: Atajos y DevTools",
+    category: "Bloque 2: Signals y Reactividad",
     question:
-      "En Chrome DevTools, ¿cómo puedes simular una conexión 3G lenta o trabajar Offline?",
-    options: [
-      "Desde la pestaña Application exclusivamente",
-      "Desde la pestaña Network, en el selector de throttling",
-      "Desde la pestaña Console",
-      "Desde los ajustes del sistema operativo",
-    ],
+      "¿Qué función de @angular/core/rxjs-interop transforma un Observable en un Signal?",
+    options: ["fromObservable()", "toSignal()", "asSignal()", "pipeToSignal()"],
     correct: 1,
     explanation:
-      "En la pestaña Network puedes usar el menú de throttling para probar velocidades como Fast 3G, Slow 3G u Offline.",
-  },
-  {
-    category: "Bloque 2: Atajos y DevTools",
-    question:
-      "¿Qué método de consola permite agrupar mensajes manteniéndolos inicialmente colapsados?",
-    options: [
-      "console.table()",
-      "console.groupCollapsed()",
-      "console.bundle()",
-      "console.folder()",
-    ],
-    correct: 1,
-    explanation:
-      "console.groupCollapsed() crea un grupo cerrado por defecto en la consola, a diferencia de console.group().",
-  },
-  {
-    category: "Bloque 2: Atajos y DevTools",
-    question:
-      "Si quieres medir cuánto tarda en ejecutarse un bloque de código sin librerías externas, ¿qué utilizas?",
-    options: [
-      "console.start() y console.stop()",
-      "console.time() y console.timeEnd()",
-      "console.benchmark()",
-      "console.timer()",
-    ],
-    correct: 1,
-    explanation:
-      "console.time('etiqueta') inicia el cronómetro y console.timeEnd('etiqueta') imprime el tiempo total transcurrido.",
+      "toSignal(observable$) suscribe internamente el flujo reactivo de RxJS y expone sus emisiones como un Signal síncrono.",
   },
 
-  // --- Bloque 3: HTML y Navegadores ---
+  // --- Bloque 3: Ciclo de Vida y Rendimiento ---
   {
-    category: "Bloque 3: HTML y Navegadores",
+    category: "Bloque 3: Ciclo de Vida y Rendimiento",
     question:
-      "¿Qué atributo HTML nativo permite cargar una imagen de forma diferida cuando se aproxima al viewport?",
+      "¿Qué estrategia de detección de cambios optimiza el componente comprobando solo inputs inmutables o eventos?",
     options: [
-      'defer="true"',
-      'async="lazy"',
-      'loading="lazy"',
-      'preload="none"',
-    ],
-    correct: 2,
-    explanation:
-      "loading='lazy' es el estándar nativo en navegadores para diferir la descarga de imágenes sin necesidad de scripts.",
-  },
-  {
-    category: "Bloque 3: HTML y Navegadores",
-    question:
-      "Entre los atributos de <script>, ¿cuál descarga en paralelo y ejecuta de inmediato al terminar la descarga?",
-    options: ["defer", "async", "inline", "preload"],
-    correct: 1,
-    explanation:
-      "async descarga sin bloquear y ejecuta inmediatamente en cuanto llega, sin respetar el orden del HTML. defer espera al parseo.",
-  },
-  {
-    category: "Bloque 3: HTML y Navegadores",
-    question:
-      "¿Cuál es la combinación de etiquetas HTML que permite crear un desplegable/acordeón sin JavaScript?",
-    options: [
-      "<accordion> y <content>",
-      "<details> y <summary>",
-      "<dropdown> y <item>",
-      "<collapse> y <panel>",
+      "ChangeDetectionStrategy.Default",
+      "ChangeDetectionStrategy.OnPush",
+      "ChangeDetectionStrategy.Lazy",
+      "ChangeDetectionStrategy.Manual",
     ],
     correct: 1,
     explanation:
-      "<details> crea el contenedor interactivo y <summary> proporciona el encabezado interactivo donde hacer clic.",
+      "OnPush evita comprobaciones innecesarias en el árbol de componentes a menos que cambien referencias de @Input o Signals.",
   },
   {
-    category: "Bloque 3: HTML y Navegadores",
+    category: "Bloque 3: Ciclo de Vida y Rendimiento",
     question:
-      "¿Cuál de estos almacenamientos del navegador persiste habitualmente tras cerrar la pestaña o ventana?",
+      "¿En qué hook del ciclo de vida están garantizados por primera vez los valores resueltos de @Input()?",
     options: [
-      "sessionStorage",
-      "Variables globales en memoria",
-      "localStorage",
-      "Estado reactivo de frontend",
+      "ngOnInit",
+      "constructor",
+      "ngAfterViewInit",
+      "ngAfterContentChecked",
     ],
-    correct: 2,
+    correct: 0,
     explanation:
-      "localStorage persiste en disco hasta ser borrado explícitamente. sessionStorage se elimina al cerrar la sesión de pestaña.",
+      "En ngOnInit Angular ya ha inicializado y enlazado los datos de entrada del componente; en el constructor aún son undefined.",
   },
   {
-    category: "Bloque 3: HTML y Navegadores",
+    category: "Bloque 3: Ciclo de Vida y Rendimiento",
     question:
-      "¿Qué tamaño aproximado suele tener el límite por origen para localStorage en la mayoría de navegadores?",
-    options: ["500 KB", "Aproximadamente 5–10 MB", "50 MB", "Ilimitado"],
+      "¿Qué hook del ciclo de vida garantiza que una referencia @ViewChild ya está disponible en el DOM?",
+    options: ["ngOnInit", "ngAfterViewInit", "ngDoCheck", "ngOnChanges"],
     correct: 1,
     explanation:
-      "Aunque no hay un valor único obligatorio por estándar, casi todos los navegadores asignan entre 5 y 10 MB por origen.",
+      "ngAfterViewInit se ejecuta justo después de que Angular inicializa y renderiza la vista y los hijos del componente.",
+  },
+  {
+    category: "Bloque 3: Ciclo de Vida y Rendimiento",
+    question:
+      "¿Qué operador moderno de RxJS cancela automáticamente una suscripción al destruirse el componente?",
+    options: [
+      "take(1)",
+      "takeUntilDestroyed()",
+      "autoUnsubscribe()",
+      "finalize()",
+    ],
+    correct: 1,
+    explanation:
+      "takeUntilDestroyed() se enlaza al DestroyRef del componente para cancelar la suscripción y evitar fugas de memoria.",
+  },
+  {
+    category: "Bloque 3: Ciclo de Vida y Rendimiento",
+    question:
+      "¿Qué API moderna permite registrar callbacks de limpieza sin implementar forzosamente ngOnDestroy?",
+    options: [
+      "DestroyRef.onDestroy()",
+      "afterDestroy()",
+      "cleanUp()",
+      "onComponentExit()",
+    ],
+    correct: 0,
+    explanation:
+      "Inyectar DestroyRef permite registrar funciones de destrucción directamente en cualquier servicio o función auxiliar.",
   },
 
-  // --- Bloque 4: CSS y Git del día a día ---
+  // --- Bloque 4: Enrutamiento, Formularios y Servicios ---
   {
-    category: "Bloque 4: CSS y Git del día a día",
+    category: "Bloque 4: Routing, Forms y Servicios",
     question:
-      "En CSS Flexbox, ¿qué propiedad alinea los elementos en el eje transversal (cross axis)?",
+      "¿Qué tipo o función se utiliza en el enrutador para definir guards funcionales?",
     options: [
-      "justify-content",
-      "align-items",
-      "flex-direction",
-      "align-self-all",
-    ],
-    correct: 1,
-    explanation:
-      "align-items alinea en el eje transversal (perpendicular), mientras que justify-content controla el eje principal.",
-  },
-  {
-    category: "Bloque 4: CSS y Git del día a día",
-    question:
-      "¿Qué unidad CSS es relativa al tamaño de fuente del elemento raíz (<html>)?",
-    options: ["em", "rem", "ch", "vh"],
-    correct: 1,
-    explanation:
-      "rem (root em) toma como base el font-size de <html>. Por el contrario, em depende del font-size del elemento padre directo.",
-  },
-  {
-    category: "Bloque 4: CSS y Git del día a día",
-    question:
-      "En Git, ¿qué comando deshace el último commit manteniendo los cambios preparados (staged)?",
-    options: [
-      "git reset --hard HEAD~1",
-      "git reset --soft HEAD~1",
-      "git clean -fd",
-      "git drop",
-    ],
-    correct: 1,
-    explanation:
-      "git reset --soft HEAD~1 retrocede el puntero pero conserva tus modificaciones en el área de preparación (stage).",
-  },
-  {
-    category: "Bloque 4: CSS y Git del día a día",
-    question:
-      "¿Qué comando de Git guarda temporalmente tus cambios sin hacer commit para dejar la rama limpia?",
-    options: ["git stash", "git pause", "git freeze", "git save"],
-    correct: 0,
-    explanation:
-      "git stash guarda las modificaciones pendientes en un búfer temporal y limpia el espacio de trabajo; se recuperan con git stash pop.",
-  },
-  {
-    category: "Bloque 4: CSS y Git del día a día",
-    question:
-      "En CSS Grid, ¿qué patrón permite crear columnas responsive que se ajusten solas al espacio disponible?",
-    options: [
-      "repeat(auto-fit, minmax(...))",
-      "display: responsive",
-      "columns: flex",
-      "grid-flow: expand",
+      "CanActivateFn",
+      "RouteFilter",
+      "AuthInterceptor",
+      "PathResolver",
     ],
     correct: 0,
     explanation:
-      "repeat(auto-fit, minmax(200px, 1fr)) genera columnas fluidas automáticas sin necesidad de añadir media queries.",
+      "CanActivateFn define guards funcionales más limpios y directos sin necesidad de crear clases ni servicios dedicados.",
+  },
+  {
+    category: "Bloque 4: Routing, Forms y Servicios",
+    question:
+      "En Angular Router, ¿qué propiedad permite cargar un componente standalone de forma lazy?",
+    options: ["loadChildren", "loadComponent", "importComponent", "asyncRoute"],
+    correct: 1,
+    explanation:
+      "loadComponent permite la carga perezosa de un único componente standalone sin necesidad de encapsularlo en un módulo.",
+  },
+  {
+    category: "Bloque 4: Routing, Forms y Servicios",
+    question:
+      "En Reactive Forms, ¿qué propiedad pasa a true cuando el usuario hace focus y luego sale (blur) del campo?",
+    options: ["dirty", "touched", "pristine", "blurred"],
+    correct: 1,
+    explanation:
+      "touched indica que el control ha perdido el foco tras interactuar con él; dirty indica que su valor ha sido modificado.",
+  },
+  {
+    category: "Bloque 4: Routing, Forms y Servicios",
+    question:
+      "Si registras un servicio con providedIn: 'root', ¿cuántas instancias se generan en toda la app?",
+    options: [
+      "Una por cada componente que lo inyecte",
+      "Una única instancia compartida (Singleton)",
+      "Una por cada ruta",
+      "Ninguna hasta registrarse en providers",
+    ],
+    correct: 1,
+    explanation:
+      "providedIn: 'root' genera un Singleton a nivel de aplicación que además permite tree-shaking si no se utiliza.",
+  },
+  {
+    category: "Bloque 4: Routing, Forms y Servicios",
+    question:
+      "Al configurar provideHttpClient(), ¿cómo se registran interceptores funcionales modernos?",
+    options: [
+      "Declarando una clase en HTTP_INTERCEPTORS",
+      "Usando withInterceptors([...])",
+      "Añadiéndolos en el constructor",
+      "Con el decorador @Interceptor",
+    ],
+    correct: 1,
+    explanation:
+      "provideHttpClient(withInterceptors([miInterceptor])) es la forma funcional moderna de encadenar interceptores HTTP.",
   },
 ];
 
-const QUESTION_TIME = 15; // Segundos por pregunta
+const QUESTION_TIME = 15;
 let timerInterval = null;
 let timeLeft = QUESTION_TIME;
 
@@ -307,13 +285,11 @@ io.on("connection", (socket) => {
       const isCorrect =
         answerIdx === questions[gameState.currentQuestion].correct;
       if (isCorrect) {
-        // Puntuación con bonus por rapidez
         player.score += 100 + timeLeft * 5;
       }
       socket.emit("player:answered", { answerIdx });
       io.emit("host:answerCount", countAnswers());
 
-      // Si todos han respondido, revelar de inmediato
       const { answered, total } = countAnswers();
       if (total > 0 && answered === total) {
         revealCurrentAnswer();
@@ -409,7 +385,6 @@ app.get("/.well-known/appspecific/com.chrome.devtools.json", (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor activo en el puerto ${PORT}`);
 });
