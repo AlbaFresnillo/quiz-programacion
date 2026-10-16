@@ -268,7 +268,8 @@
         myLastAnswer = null;
 
         document.getElementById("q-category").innerText = data.category;
-        document.getElementById("q-text").innerText = data.question;
+        document.getElementById("q-text").innerText =
+          `${data.index}/${data.total}. ${data.question}`;
 
         const feedbackBox = document.getElementById("feedback-box");
         feedbackBox.style.display = "none";

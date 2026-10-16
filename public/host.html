@@ -234,7 +234,8 @@
 
         document.getElementById("q-category").innerText = data.category;
         document.getElementById("ans-counter").innerText = "Respuestas: 0";
-        document.getElementById("q-text").innerText = data.question;
+        document.getElementById("q-text").innerText =
+          `${data.index}/${data.total}. ${data.question}`;
         document.getElementById("explanation").style.display = "none";
         document.getElementById("btn-reveal").style.display = "inline-block";
         document.getElementById("btn-next").style.display = "none";
